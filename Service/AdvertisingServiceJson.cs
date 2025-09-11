@@ -1,4 +1,4 @@
-﻿using AdvertisingService.Data;
+using AdvertisingService.Data;
 using AdvertisingService.Models;
 using System.Collections.Concurrent;
 using System.Text.Json;
@@ -8,8 +8,6 @@ namespace AdvertisingService.Service
     public class AdvertisingServiceJson : IAdvertisingServiceJson
     {
         private readonly IAdvertisingRepository _repository;
-        private readonly ConcurrentDictionary<string, Lazy<List<string>>> _searchCache = new();
-
 
         public AdvertisingServiceJson(IAdvertisingRepository repository)
         {
@@ -30,10 +28,7 @@ namespace AdvertisingService.Service
                 if (data?.Platforms == null)
                     return false;
 
-                
                 _repository.Clear();
-                _searchCache.Clear();
-
 
                 foreach (var platform in data.Platforms)
                 {
@@ -67,17 +62,13 @@ namespace AdvertisingService.Service
             if (normalized == null)
                 return new List<string>();
 
-            
-            return _searchCache.GetOrAdd(normalized,
-                new Lazy<List<string>>(() => SearchPlatformsInternal(normalized))).Value;
+            return SearchPlatformsInternal(normalized);
         }
 
         private List<string> SearchPlatformsInternal(string location)
         {
             var result = new HashSet<string>();
             var allLocations = _repository.GetAllLocations().ToList();
-
-
             var sortedLocations = allLocations.OrderByDescending(loc => loc.Length).ToList();
 
             foreach (var sortedLocation in sortedLocations)
@@ -95,7 +86,6 @@ namespace AdvertisingService.Service
             return result.ToList();
         }
 
-        
         private bool IsPrefix(string storedLocation, string requestedLocation)
         {
             if (storedLocation == "/")
@@ -109,7 +99,6 @@ namespace AdvertisingService.Service
         {
             if (string.IsNullOrWhiteSpace(location) || !location.StartsWith('/'))
                 return null;
-
 
             location = location.TrimEnd('/');
             return location.Length == 0 ? "/" : location;
