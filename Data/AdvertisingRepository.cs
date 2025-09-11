@@ -4,7 +4,7 @@ namespace AdvertisingService.Data
 {
     public class AdvertisingRepository : IAdvertisingRepository
     {
-        private readonly ConcurrentDictionary<string, List<string>> _locationPlatforms = new();
+        private readonly Dictionary<string, List<string>> _locationPlatforms = new();
 
         public void Clear()
         {
