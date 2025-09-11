@@ -1,14 +1,17 @@
 ﻿using AdvertisingService.Data;
 using AdvertisingService.Models;
+using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace AdvertisingService.Service
 {
-    public class AdvertisingService : IAdvertisingService
+    public class AdvertisingServiceJson : IAdvertisingServiceJson
     {
         private readonly IAdvertisingRepository _repository;
+        private readonly ConcurrentDictionary<string, Lazy<List<string>>> _searchCache = new();
 
-        public AdvertisingService(IAdvertisingRepository repository)
+
+        public AdvertisingServiceJson(IAdvertisingRepository repository)
         {
             _repository = repository;
         }
@@ -27,10 +30,11 @@ namespace AdvertisingService.Service
                 if (data?.Platforms == null)
                     return false;
 
-                // Очищаем текущие данные
+                
                 _repository.Clear();
+                _searchCache.Clear();
 
-                // Обрабатываем каждую площадку
+
                 foreach (var platform in data.Platforms)
                 {
                     if (string.IsNullOrWhiteSpace(platform.Name) || platform.Locations == null)
@@ -63,31 +67,42 @@ namespace AdvertisingService.Service
             if (normalized == null)
                 return new List<string>();
 
-            var result = new List<string>();
-            var current = normalized;
+            
+            return _searchCache.GetOrAdd(normalized,
+                new Lazy<List<string>>(() => SearchPlatformsInternal(normalized))).Value;
+        }
 
-            // Проверяем все вложенные локации, включая корень
-            while (!string.IsNullOrEmpty(current))
+        private List<string> SearchPlatformsInternal(string location)
+        {
+            var result = new HashSet<string>();
+            var allLocations = _repository.GetAllLocations().ToList();
+
+
+            var sortedLocations = allLocations.OrderByDescending(loc => loc.Length).ToList();
+
+            foreach (var sortedLocation in sortedLocations)
             {
-                var platforms = _repository.GetPlatformsForLocation(current);
-                foreach (var platform in platforms)
+                if (IsPrefix(sortedLocation, location))
                 {
-                    // Ручная проверка уникальности
-                    if (!result.Contains(platform))
+                    var platforms = _repository.GetPlatformsForLocation(sortedLocation);
+                    foreach (var platform in platforms)
                     {
                         result.Add(platform);
                     }
                 }
-
-                // Поднимаемся на уровень выше
-                var lastSlash = current.LastIndexOf('/');
-                if (lastSlash == -1)
-                    break;
-
-                current = current[..lastSlash];
             }
 
-            return result;
+            return result.ToList();
+        }
+
+        
+        private bool IsPrefix(string storedLocation, string requestedLocation)
+        {
+            if (storedLocation == "/")
+                return requestedLocation.StartsWith("/");
+
+            return requestedLocation == storedLocation ||
+                   requestedLocation.StartsWith(storedLocation + "/");
         }
 
         private static string NormalizeLocation(string location)
@@ -95,7 +110,7 @@ namespace AdvertisingService.Service
             if (string.IsNullOrWhiteSpace(location) || !location.StartsWith('/'))
                 return null;
 
-            // Удаляем завершающие слэши
+
             location = location.TrimEnd('/');
             return location.Length == 0 ? "/" : location;
         }

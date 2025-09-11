@@ -1,4 +1,8 @@
 
+using AdvertisingService.Extensions;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 namespace AdvertisingService
 {
     public class Program
@@ -7,18 +11,30 @@ namespace AdvertisingService
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddAdvertisingServices();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Advertising Service API",
+                    Version = "v1",
+                    Description = "API для управления рекламными площадками и локациями",
+                });
+            });
+
+                builder.Services.AddControllers();
+           
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();

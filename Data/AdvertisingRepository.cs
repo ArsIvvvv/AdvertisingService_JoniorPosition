@@ -13,14 +13,15 @@ namespace AdvertisingService.Data
 
         public void AddPlatformToLocation(string location, string platform)
         {
-            _locationPlatforms.AddOrUpdate(location,
-                _ => new List<string> { platform },
-                (_, list) =>
-                {
-                    if (!list.Contains(platform))
-                        list.Add(platform);
-                    return list;
-                });
+            if (!_locationPlatforms.ContainsKey(location))
+            {
+                _locationPlatforms[location] = new List<string>();
+            }
+
+            if (!_locationPlatforms[location].Contains(platform))
+            {
+                _locationPlatforms[location].Add(platform);
+            }
         }
 
         public List<string> GetPlatformsForLocation(string location)
@@ -30,9 +31,10 @@ namespace AdvertisingService.Data
                 : new List<string>();
         }
 
-        public bool LocationExists(string location)
+        public IEnumerable<string> GetAllLocations()
         {
-            return _locationPlatforms.ContainsKey(location);
+            return _locationPlatforms.Keys.ToList();
         }
+
     }
 }
