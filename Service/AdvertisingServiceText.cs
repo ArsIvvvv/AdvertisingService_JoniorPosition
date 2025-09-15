@@ -6,11 +6,11 @@ using System.Text.Json;
 
 namespace AdvertisingService.Service
 {
-    public class AdvertisingServiceJson : IAdvertisingServiceJson
+    public class AdvertisingServiceText : IAdvertisingServiceText
     {
         private readonly IAdvertisingRepository _repository;
 
-        public AdvertisingServiceJson(IAdvertisingRepository repository)
+        public AdvertisingServiceText(IAdvertisingRepository repository)
         {
             _repository = repository;
         }
