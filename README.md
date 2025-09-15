@@ -14,7 +14,7 @@ dotnet run --urls "https://localhost:7239"
 и перейдите "https://localhost:7239"/swagger
 ```
 
-Создайте файл
+Создайте файл. 
 Пример файла
 ```bash
 Яндекс.Директ:/ru
