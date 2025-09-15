@@ -14,28 +14,12 @@ dotnet run --urls "https://localhost:7239"
 и перейдите "https://localhost:7239"/swagger
 ```
 
-Создайте json-файл
-Пример json-файла
+Создайте jфайл
+Пример файла
 
 ```json
-{
-  "platforms": [
-    {
-      "name": "Яндекс.Директ",
-      "locations": [ "/ru" ]
-    },
-    {
-      "name": "Ревдинский рабочий",
-      "locations": [ "/ru/svrd/revda", "/ru/svrd/pervik" ]
-    },
-    {
-      "name": "Газета уральских москвичей",
-      "locations": [ "/ru/msk", "/ru/permobl", "/ru/chelobl" ]
-    },
-    {
-      "name": "Крутая реклама",
-      "locations": [ "/ru/svrd" ]
-    }
-  ]
-}
+Яндекс.Директ:/ru
+Ревдинский рабочий:/ru/svrd/revda,/ru/svrd/pervik
+Газета уральских москвичей:/ru/msk,/ru/permobl,/ru/chelobl
+Крутая реклама:/ru/svrd
 ```
