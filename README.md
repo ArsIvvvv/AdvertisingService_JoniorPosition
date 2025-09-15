@@ -16,8 +16,9 @@ dotnet run --urls "https://localhost:7239"
 
 Создайте файл
 Пример файла
-
+```bash
 Яндекс.Директ:/ru
 Ревдинский рабочий:/ru/svrd/revda,/ru/svrd/pervik
 Газета уральских москвичей:/ru/msk,/ru/permobl,/ru/chelobl
 Крутая реклама:/ru/svrd
+```
